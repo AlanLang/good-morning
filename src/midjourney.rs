@@ -21,10 +21,24 @@ impl Midjourney {
         let id = result.result;
         let start = Instant::now() + Duration::from_secs(60);
         let mut interval = time::interval_at(start, time::Duration::from_secs(60));
+        let mut retry_count = 0;
+
         loop {
             interval.tick().await;
             debug!("等待图片生成完成: {}", id);
-            let jog = self.get_job(id.clone()).await?;
+
+            let jog = match self.get_job(id.clone()).await {
+                std::result::Result::Ok(jog) => jog,
+                Err(err) => {
+                    retry_count += 1;
+                    if retry_count <= 5 {
+                        continue; // 继续循环进行重试
+                    } else {
+                        return Err(err); // 达到最大重试次数后退出循环并返回错误
+                    }
+                }
+            };
+
             if jog.progress == "100%" {
                 break;
             }
@@ -32,10 +46,23 @@ impl Midjourney {
         let change_result = self
             .submit_change(ImageChangeParams::new(id.clone()))
             .await?;
+
+        let mut retry_count = 0;
+        let id = change_result.result;
         loop {
-            debug!("等待图片选取完成: {}", id);
             interval.tick().await;
-            let jog = self.get_job(change_result.result.clone()).await?;
+            debug!("等待图片选取完成: {}", id);
+            let jog = match self.get_job(id.clone()).await {
+                std::result::Result::Ok(jog) => jog,
+                Err(err) => {
+                    retry_count += 1;
+                    if retry_count <= 5 {
+                        continue; // 继续循环进行重试
+                    } else {
+                        return Err(err); // 达到最大重试次数后退出循环并返回错误
+                    }
+                }
+            };
             if jog.progress == "100%" {
                 return Ok(jog.imageUrl);
             }

@@ -27,6 +27,14 @@ impl Chat {
         let result = response.message().content.clone();
         Ok(result)
     }
+
+    pub async fn get_today_note(&self, weather: String) -> Result<String> {
+        let prompt = format!("我告诉你今天的星期和天气，你根据生成一句关心我的话，工作日可以让我好好工作，周末了可以让我好好享受周末时光，如果周五了会很开心因为快放假了，语气要温柔可爱，语言中不需要再出现天气的内容，也不要叫我亲爱的。今天是:{}", weather);
+
+        let response: CompletionResponse = self.client.send_message(prompt).await?;
+        let result = response.message().content.clone();
+        Ok(result)
+    }
 }
 
 #[cfg(test)]
@@ -40,6 +48,21 @@ mod tests {
         let chat = super::Chat::new(token).unwrap();
         let result = chat
             .make_midjourney_prompt_by_poetry("两岸猿声啼不住，轻舟已过万重山".to_string())
+            .await
+            .unwrap();
+        println!("-------");
+        println!("{}", result);
+        println!("-------");
+        assert!(result.len() > 0);
+    }
+
+    #[tokio::test]
+    async fn get_today_note_test() {
+        dotenv::dotenv().ok();
+        let token = env::var("CHATGPT_TOKEN").unwrap();
+        let chat = super::Chat::new(token).unwrap();
+        let result = chat
+            .get_today_note("星期五，天气: 雨，温度 25 摄氏度".to_string())
             .await
             .unwrap();
         println!("-------");
