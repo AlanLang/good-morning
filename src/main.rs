@@ -22,10 +22,23 @@ async fn main() {
     dotenv::dotenv().ok();
     env_logger::init();
     debug!("Starting up");
-    let gpt_token = env::var("CHATGPT_TOKEN").unwrap();
-    let mj_url = env::var("MIDJOURNEY_PROXY_RUL").unwrap();
-    let mj_secret = env::var("MIDJOURNEY_PROXY_SECRET").unwrap();
-    let wechat_bot_url = env::var("WECHAT_BOT_URL").unwrap();
+    let gpt_token = env::var("CHATGPT_TOKEN")
+        .map_err(|e| format!("无法获取 CHATGPT_TOKEN 环境变量: {}", e))
+        .unwrap();
+    let mj_url = env::var("MIDJOURNEY_PROXY_RUL")
+        .map_err(|e| format!("无法获取 MIDJOURNEY_PROXY_RUL 环境变量: {}", e.to_string()))
+        .unwrap();
+    let mj_secret = env::var("MIDJOURNEY_PROXY_SECRET")
+        .map_err(|e| {
+            format!(
+                "无法获取 MIDJOURNEY_PROXY_SECRET 环境变量: {}",
+                e.to_string()
+            )
+        })
+        .unwrap();
+    let wechat_bot_url = env::var("WECHAT_BOT_URL")
+        .map_err(|e| format!("无法获取 WECHAT_BOT_URL 环境变量: {}", e.to_string()))
+        .unwrap();
     let smms_token = env::var("SMMS_TOKEN").ok();
 
     let env = TaskEnv {
