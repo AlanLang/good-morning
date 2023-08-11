@@ -7,7 +7,6 @@ use reqwest::{
     Client,
 };
 use serde::{Deserialize, Serialize};
-use std::f32::consts::E;
 use std::io::Cursor;
 use uuid::Uuid;
 pub async fn upload_image(token: String, image_url: String) -> Result<String> {

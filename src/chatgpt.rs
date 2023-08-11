@@ -1,7 +1,6 @@
 extern crate dotenv;
 use anyhow::{Ok, Result};
 use chatgpt::{prelude::*, types::CompletionResponse};
-use std::env;
 
 pub struct Chat {
     client: ChatGPT,
@@ -62,7 +61,7 @@ mod tests {
         let token = env::var("CHATGPT_TOKEN").unwrap();
         let chat = super::Chat::new(token).unwrap();
         let result = chat
-            .get_today_note("星期五，天气: 雨，温度 25 摄氏度".to_string())
+            .get_today_note("周一，天气 晴，温度 25 摄氏度".to_string())
             .await
             .unwrap();
         println!("-------");

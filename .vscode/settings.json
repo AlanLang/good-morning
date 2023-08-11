@@ -3,6 +3,7 @@
     "citykey",
     "midjourney",
     "serde",
+    "smms",
     "wechat"
   ]
 }

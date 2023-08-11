@@ -1,5 +1,4 @@
 use anyhow::{Ok, Result};
-use log::debug;
 use serde::{Deserialize, Serialize};
 
 pub async fn send_message(url: String, info: MessageInfo) -> Result<()> {

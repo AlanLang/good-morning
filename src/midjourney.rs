@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use anyhow::{Ok, Result};
-use log::{debug, info};
+use log::debug;
 use reqwest::header::{self, HeaderMap, HeaderValue};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
