@@ -17,6 +17,3 @@ anyhow = "1.0.72"
 chatgpt_rs = "1.1.13"
 chrono = "0.4.26"
 cron_tab = {version = "0.2", features = ["async"]}
-
-[target.'cfg(all(target_env = "musl", target_pointer_width = "64"))'.dependencies.jemallocator]
-version = "0.5"
