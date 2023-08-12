@@ -50,13 +50,18 @@ async fn main() {
         smms_token,
     };
 
-    run(env.clone()).await.unwrap();
+    // run(env.clone()).await.unwrap();
 
-    let local = Local::from_offset(&FixedOffset::east(8));
+    let offset = FixedOffset::east_opt(8).unwrap();
+    let local = Local::from_offset(&offset);
     let mut cron = AsyncCron::new(local);
-    let current_datetime: DateTime<Local> = local.timestamp(Local::now().timestamp(), 0);
+    let current_datetime: DateTime<Local> =
+        local.timestamp_opt(Local::now().timestamp(), 0).unwrap();
 
-    debug!("当前时间: {}", current_datetime.format("%Y-%m-%d %H:%M:%S"));
+    debug!(
+        "运行成功，当前时间: {}",
+        current_datetime.format("%Y-%m-%d %H:%M:%S")
+    );
 
     cron.start().await;
     let env = Arc::new(env);
@@ -108,7 +113,7 @@ async fn run(env: TaskEnv) -> Result<()> {
     }
 
     let forecast = &weather.data.forecast[0];
-    let today = Local::today();
+    let today = Local::now();
     let weekday = today.weekday();
     let chinese_weekday = match weekday {
         Weekday::Mon => "周一",

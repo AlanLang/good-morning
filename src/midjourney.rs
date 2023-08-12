@@ -64,7 +64,7 @@ impl Midjourney {
                 }
             };
             if jog.progress == "100%" {
-                return Ok(jog.imageUrl);
+                return Ok(jog.image_url);
             }
         }
     }
@@ -142,7 +142,7 @@ pub struct JobStatus {
     id: String,
     status: String,
     progress: String,
-    imageUrl: String,
+    image_url: String,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]

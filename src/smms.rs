@@ -26,7 +26,7 @@ async fn upload_image_to_smms(buffer: Vec<u8>, token: &str) -> Result<String> {
     headers.insert(header::ACCEPT, HeaderValue::from_static("application/json"));
     let client = Client::new();
     // 创建一个多部分表单
-    let file_name = Uuid::new_v4().to_string() + ".webp";
+    let file_name = Uuid::new_v4().to_string() + ".jpeg";
     let form = Form::new()
         // 添加文件部分
         .part("smfile", Part::bytes(buffer).file_name(file_name))
@@ -44,7 +44,7 @@ async fn upload_image_to_smms(buffer: Vec<u8>, token: &str) -> Result<String> {
     let upload_result = serde_json::from_str::<UploadResult>(&result);
     match upload_result {
         Ok(a) => Ok(a.data.url),
-        Err(e) => {
+        Err(_) => {
             let result = serde_json::from_str::<UploadAlreadyHave>(&result);
             match result {
                 Ok(a) => Ok(a.images),
@@ -73,7 +73,7 @@ async fn process_image(file: Vec<u8>) -> Result<Vec<u8>> {
         )
         .write_to(
             &mut Cursor::new(&mut buffer),
-            image::ImageOutputFormat::WebP,
+            image::ImageOutputFormat::Jpeg(80),
         )?;
     debug!("file size: {}", buffer.len());
     Ok(buffer)
