@@ -95,16 +95,16 @@ struct TaskEnv {
 }
 
 async fn run(env: TaskEnv) -> Result<()> {
-    let weather = get_weather(env.city_code).await?;
+    let weather = get_weather(&env.city_code).await?;
     let poetry = poetry::get_poetry().await?;
 
     let gpt = Chat::new(env.gpt_token)?;
     let prompt = gpt
-        .make_midjourney_prompt_by_poetry(poetry.content.to_string())
+        .make_midjourney_prompt_by_poetry(&poetry.content)
         .await?;
     let midjourney = midjourney::Midjourney::new(env.mj_url, env.mj_secret);
     let mut image = midjourney
-        .get_first_image(prompt)
+        .get_first_image(&prompt)
         .await
         .unwrap_or_else(|e| {
             log::error!("生成图片出错: {}", e);
@@ -132,7 +132,7 @@ async fn run(env: TaskEnv) -> Result<()> {
         "{} 天气 {} , 温度 {}°C",
         chinese_weekday, forecast.type_field, weather.data.wendu
     );
-    let today_note = gpt.get_today_note(title.clone()).await?;
+    let today_note = gpt.get_today_note(&title).await?;
 
     let description = format!(
         "{}\n\n今日诗句\n{}\n---{}",
@@ -140,6 +140,6 @@ async fn run(env: TaskEnv) -> Result<()> {
     );
     let message = MessageInfo::new(title, description, image);
     info!("message is {:?}", message);
-    let _ = send_message(env.wechat_bot_url, message).await?;
+    let _ = send_message(&env.wechat_bot_url, message).await?;
     Ok(())
 }

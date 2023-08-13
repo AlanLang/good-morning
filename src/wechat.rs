@@ -1,9 +1,9 @@
 use anyhow::{Ok, Result};
 use serde::{Deserialize, Serialize};
 
-pub async fn send_message(url: String, info: MessageInfo) -> Result<()> {
+pub async fn send_message(url: &str, info: MessageInfo) -> Result<()> {
     let _ = reqwest::Client::new()
-        .post(url.clone())
+        .post(url)
         .json(&info)
         .send()
         .await?
@@ -66,6 +66,6 @@ mod tests {
             description,
             "https://vip2.loli.io/2023/08/02/FZS59UEMp7BqoTW.webp".to_string(),
         );
-        let _ = super::send_message("https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=bf7b051b-a8e9-4af6-a836-e623a1988b81".to_string(), message).await.unwrap();
+        let _ = super::send_message("https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=bf7b051b-a8e9-4af6-a836-e623a1988b81", message).await.unwrap();
     }
 }

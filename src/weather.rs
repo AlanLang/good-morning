@@ -2,7 +2,7 @@ use anyhow::{Ok, Result};
 use log::debug;
 use serde::{Deserialize, Serialize};
 
-pub async fn get_weather(city_code: String) -> Result<WeatherResult> {
+pub async fn get_weather(city_code: &str) -> Result<WeatherResult> {
     debug!("Getting weather for {}", city_code);
     let url = format!("http://t.weather.sojson.com/api/weather/city/{}", city_code);
     let body = reqwest::get(url).await?.json::<WeatherResult>().await?;
@@ -82,7 +82,7 @@ pub struct Yesterday {
 mod tests {
     #[tokio::test]
     async fn it_works() {
-        let weather = super::get_weather("101190201".to_string()).await.unwrap();
+        let weather = super::get_weather("101190201").await.unwrap();
         // 验证 state = 200
         assert_eq!(weather.status, 200);
         assert_eq!(weather.city_info.city, "无锡市");

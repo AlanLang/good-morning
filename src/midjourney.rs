@@ -15,7 +15,7 @@ impl Midjourney {
         Self { proxy_url, secret }
     }
 
-    pub async fn get_first_image(&self, prompt: String) -> Result<String> {
+    pub async fn get_first_image(&self, prompt: &str) -> Result<String> {
         debug!("Getting first image: {}", prompt);
         let result = self.submit_image(prompt).await?;
         let id = result.result;
@@ -27,7 +27,7 @@ impl Midjourney {
             interval.tick().await;
             debug!("等待图片生成完成: {}", id);
 
-            let jog = match self.get_job(id.clone()).await {
+            let jog = match self.get_job(&id).await {
                 std::result::Result::Ok(jog) => jog,
                 Err(err) => {
                     retry_count += 1;
@@ -52,7 +52,7 @@ impl Midjourney {
         loop {
             interval.tick().await;
             debug!("等待图片选取完成: {}", id);
-            let jog = match self.get_job(id.clone()).await {
+            let jog = match self.get_job(&id).await {
                 std::result::Result::Ok(jog) => jog,
                 Err(err) => {
                     retry_count += 1;
@@ -79,14 +79,14 @@ impl Midjourney {
         Ok(headers)
     }
 
-    pub async fn submit_image(&self, prompt: String) -> Result<SubmitImageResult> {
+    pub async fn submit_image(&self, prompt: &str) -> Result<SubmitImageResult> {
         debug!("Submitting image: {}", prompt);
         let url = format!("{}/submit/imagine", self.proxy_url);
         let body = json!({ "prompt": prompt });
         debug!("body: {}", body);
 
         let result = reqwest::Client::new()
-            .post(url.clone())
+            .post(url)
             .headers(self.get_header()?)
             .json(&body)
             .send()
@@ -101,7 +101,7 @@ impl Midjourney {
         debug!("Submitting change: {:?}", params);
         let url = format!("{}/submit/change", self.proxy_url);
         let result = reqwest::Client::new()
-            .post(url.clone())
+            .post(url)
             .headers(self.get_header()?)
             .json(&params)
             .send()
@@ -112,11 +112,11 @@ impl Midjourney {
         Ok(result)
     }
 
-    pub async fn get_job(&self, job_id: String) -> Result<JobStatus> {
+    pub async fn get_job(&self, job_id: &str) -> Result<JobStatus> {
         debug!("Getting job: {}", job_id);
         let url = format!("{}//task/{}/fetch", self.proxy_url, job_id);
         let result = reqwest::Client::new()
-            .get(url.clone())
+            .get(url)
             .headers(self.get_header()?)
             .send()
             .await?
@@ -179,10 +179,7 @@ mod tests {
         let secret = env::var("MIDJOURNEY_PROXY_SECRET").unwrap();
 
         let midjourney = super::Midjourney::new(url, secret);
-        let result = midjourney
-            .submit_image("一只快乐的小兔子".to_string())
-            .await
-            .unwrap();
+        let result = midjourney.submit_image("一只快乐的小兔子").await.unwrap();
         assert!(result.code == 1);
         assert!(result.description == "提交成功");
     }
@@ -194,10 +191,7 @@ mod tests {
         let secret = env::var("MIDJOURNEY_PROXY_SECRET").unwrap();
 
         let midjourney = super::Midjourney::new(url, secret);
-        let result = midjourney
-            .get_job("1691733511960857".to_string())
-            .await
-            .unwrap();
+        let result = midjourney.get_job("1691733511960857").await.unwrap();
         assert!(result.action == "UPSCALE");
         assert!(result.id == "1691733511960857");
         assert!(result.status == "SUCCESS");
@@ -228,10 +222,7 @@ mod tests {
         let secret = env::var("MIDJOURNEY_PROXY_SECRET").unwrap();
 
         let midjourney = super::Midjourney::new(url, secret);
-        let image = midjourney
-            .get_first_image("黑色的小狗".to_string())
-            .await
-            .unwrap();
+        let image = midjourney.get_first_image("黑色的小狗").await.unwrap();
         assert!(image.len() > 0)
     }
 
