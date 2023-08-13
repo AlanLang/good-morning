@@ -40,6 +40,7 @@ async fn main() {
         .map_err(|e| format!("无法获取 WECHAT_BOT_URL 环境变量: {}", e.to_string()))
         .unwrap();
     let smms_token = env::var("SMMS_TOKEN").ok();
+    let immediately = env::var("IMMEDIATELY").ok();
 
     let env = TaskEnv {
         gpt_token,
@@ -50,7 +51,10 @@ async fn main() {
         smms_token,
     };
 
-    // run(env.clone()).await.unwrap();
+    if let Some(_) = immediately {
+        run(env.clone()).await.unwrap();
+        return;
+    }
 
     let local = Local::now().timezone();
     let mut cron = AsyncCron::new(local);
