@@ -10,7 +10,7 @@ use crate::{
     wechat::{send_message, MessageInfo},
 };
 use anyhow::Result;
-use chrono::{DateTime, Datelike, FixedOffset, Local, TimeZone, Weekday};
+use chrono::{DateTime, Datelike, Local, TimeZone, Weekday};
 use cron_tab::AsyncCron;
 use log::{debug, info};
 use std::env;
@@ -52,8 +52,7 @@ async fn main() {
 
     // run(env.clone()).await.unwrap();
 
-    let offset = FixedOffset::east_opt(8).unwrap();
-    let local = Local::from_offset(&offset);
+    let local = Local::now().timezone();
     let mut cron = AsyncCron::new(local);
     let current_datetime: DateTime<Local> =
         local.timestamp_opt(Local::now().timestamp(), 0).unwrap();
