@@ -10,7 +10,7 @@ use crate::{
     wechat::{send_message, MessageInfo},
 };
 use anyhow::Result;
-use chrono::{DateTime, Datelike, Local, TimeZone, Weekday};
+use chrono::{DateTime, Datelike, FixedOffset, Local, TimeZone, Weekday};
 use cron_tab::AsyncCron;
 use log::{debug, info};
 use std::env;
@@ -56,7 +56,8 @@ async fn main() {
         return;
     }
 
-    let local = Local::now().timezone();
+    let offset = FixedOffset::east_opt(8).unwrap();
+    let local = Local::from_offset(&offset);
     let mut cron = AsyncCron::new(local);
     let current_datetime: DateTime<Local> =
         local.timestamp_opt(Local::now().timestamp(), 0).unwrap();
@@ -66,11 +67,10 @@ async fn main() {
         current_datetime.format("%Y-%m-%d %H:%M:%S")
     );
 
-    cron.start().await;
     let env = Arc::new(env);
-
+    let expression = env::var("CRON_EXPRESSION").unwrap_or_else(|_| "0 10 11 * * ?".to_string());
     let _ = cron
-        .add_fn("0 0 9 * * ?", move || {
+        .add_fn(&expression, move || {
             info!("开始执行任务");
             let env = env.clone();
             async move {
@@ -78,7 +78,7 @@ async fn main() {
             }
         })
         .await;
-
+    cron.start().await;
     std::thread::sleep(std::time::Duration::from_secs(u64::MAX));
     // stop cron
     cron.stop();
