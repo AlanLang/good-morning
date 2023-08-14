@@ -28,7 +28,7 @@ impl Chat {
     }
 
     pub async fn get_today_note(&self, weather: &str) -> Result<String> {
-        let prompt = format!("我告诉你今天的星期和天气，你根据生成一句关心我的话，内容可以稍微多一点，工作日可以让我好好工作，周末了可以让我好好享受周末时光，如果周五了会很开心因为快放假了，语气要温柔可爱，语言中不需要再出现天气的内容，也不要叫我亲爱的。今天是::{}", weather);
+        let prompt = format!("我告诉你今天的星期和天气，你根据生成一句关心我的话，内容可以稍微多一点，但是文字总数不能超多100字，工作日可以让我好好工作，周末了可以让我好好享受周末时光，如果周五了会很开心因为快放假了，语气要温柔可爱，语言中不需要再出现天气的内容，也不要叫我亲爱的。今天是::{}", weather);
 
         let response: CompletionResponse = self.client.send_message(prompt).await?;
         let result = response.message().content.clone();
