@@ -1,4 +1,5 @@
 mod chatgpt;
+mod holiday;
 mod midjourney;
 mod poetry;
 mod smms;
@@ -128,11 +129,20 @@ async fn run(env: TaskEnv) -> Result<()> {
         Weekday::Sat => "周六",
         Weekday::Sun => "周日",
     };
+
+    let holiday_info = holiday::get_holiday_info(&today).await;
+
+    let today_info = match holiday_info {
+        Some(holiday) => holiday.name,
+        None => chinese_weekday.to_string(),
+    };
+
     // 取第一位
     let title = format!(
-        "{} 天气 {} , 温度 {}°C",
-        chinese_weekday, forecast.type_field, weather.data.wendu
+        "{} {} {}°C",
+        today_info, forecast.type_field, weather.data.wendu
     );
+
     let today_note = gpt.get_today_note(&title).await?;
 
     let description = format!(
