@@ -68,7 +68,7 @@ async fn main() {
     );
 
     let env = Arc::new(env);
-    let expression = env::var("CRON_EXPRESSION").unwrap_or_else(|_| "0 10 11 * * ?".to_string());
+    let expression = env::var("CRON_EXPRESSION").unwrap_or_else(|_| "0 0 9 * * ?".to_string());
     let _ = cron
         .add_fn(&expression, move || {
             info!("开始执行任务");
