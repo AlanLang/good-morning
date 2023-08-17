@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 pub async fn get_poetry() -> Result<PoetryResult> {
     debug!("Getting poetry");
-    let url = format!("https://v1.jinrishici.com/all");
+    let url = format!("https://v1.jinrishici.com/shanshui");
     let body = reqwest::get(url).await?.json::<PoetryResult>().await?;
     Ok(body)
 }
