@@ -20,7 +20,7 @@ impl Chat {
     }
 
     pub async fn make_midjourney_prompt_by_poetry(&self, poetry: &str) -> Result<String> {
-        let prompt = format!("我给你一些汉语古诗词或其他古文的句子，请你仔细在汉语语境下理解该句子，然后将其转换为Midjourney网站绘图所能识别的英文prompt，要求prompt尽可能详细，且其中要体现中国古典山水画的特色。我给你的句子是:{}", poetry);
+        let prompt = format!("我给你一些汉语古诗词或其他古文的句子，请你仔细在汉语语境下理解该句子，然后将其转换为Midjourney网站绘图所能识别的英文prompt，要求prompt尽可能详细，且其中要体现中国古典山水画的特色，你只需要回复我生成的 prompt 即可。我给你的句子是:{}", poetry);
 
         let response: CompletionResponse = self.client.send_message(prompt).await?;
         let result = response.message().content.clone();
