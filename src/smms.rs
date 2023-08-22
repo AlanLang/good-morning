@@ -26,7 +26,7 @@ async fn upload_image_to_smms(buffer: Vec<u8>, token: &str) -> Result<String> {
     headers.insert(header::ACCEPT, HeaderValue::from_static("application/json"));
     let client = Client::new();
     // 创建一个多部分表单
-    let file_name = Uuid::new_v4().to_string() + ".jpeg";
+    let file_name = Uuid::new_v4().to_string() + ".png";
     let form = Form::new()
         // 添加文件部分
         .part("smfile", Part::bytes(buffer).file_name(file_name))
@@ -71,10 +71,7 @@ async fn process_image(file: Vec<u8>) -> Result<Vec<u8>> {
             image.height(),
             image::imageops::FilterType::Lanczos3,
         )
-        .write_to(
-            &mut Cursor::new(&mut buffer),
-            image::ImageOutputFormat::Jpeg(80),
-        )?;
+        .write_to(&mut Cursor::new(&mut buffer), image::ImageOutputFormat::Png)?;
     debug!("file size: {}", buffer.len());
     Ok(buffer)
 }
