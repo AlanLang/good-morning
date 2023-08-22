@@ -103,7 +103,7 @@ async fn run(env: TaskEnv) -> Result<()> {
     let prompt = gpt
         .make_midjourney_prompt_by_poetry(&poetry.content)
         .await?;
-    let prompt = format!("{} {}", prompt, "--ar 700:310");
+    let prompt = format!("{} {}", prompt, "--ar 1068*455");
     let midjourney = midjourney::Midjourney::new(env.mj_url, env.mj_secret);
     let mut image = midjourney
         .get_first_image(&prompt)
