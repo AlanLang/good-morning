@@ -2,6 +2,7 @@ mod chatgpt;
 mod holiday;
 mod midjourney;
 mod poetry;
+mod save;
 mod smms;
 mod weather;
 mod wechat;
@@ -14,6 +15,7 @@ use anyhow::Result;
 use chrono::{DateTime, Datelike, FixedOffset, Local, TimeZone, Weekday};
 use cron_tab::AsyncCron;
 use log::{debug, info};
+
 use std::env;
 use std::sync::Arc;
 use weather::get_weather;
@@ -149,8 +151,9 @@ async fn run(env: TaskEnv) -> Result<()> {
         "{}\n\n今日诗句\n{}\n---{}",
         today_note, poetry.content, poetry.author
     );
-    let message = MessageInfo::new(title, description, image);
+    let message = MessageInfo::new(title, description, image.clone());
     info!("message is {:?}", message);
+    let _ = save::save(&poetry.content, &image);
     let _ = send_message(&env.wechat_bot_url, message).await?;
     Ok(())
 }
