@@ -38,7 +38,7 @@ impl Midjourney {
                     }
                 }
             };
-
+            debug!("image progress: {}", jog.progress);
             if jog.progress == "100%" {
                 break;
             }
