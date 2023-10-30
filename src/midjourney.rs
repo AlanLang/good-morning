@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use anyhow::{Ok, Result};
-use log::debug;
+use log::{debug, error};
 use reqwest::header::{self, HeaderMap, HeaderValue};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -55,6 +55,7 @@ impl Midjourney {
             let jog = match self.get_job(&id).await {
                 std::result::Result::Ok(jog) => jog,
                 Err(err) => {
+                    error!("获取图片选取结果失败: {}", err);
                     retry_count += 1;
                     if retry_count <= 5 {
                         continue; // 继续循环进行重试
