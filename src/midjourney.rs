@@ -17,7 +17,10 @@ impl Midjourney {
 
     pub async fn get_first_image(&self, prompt: &str) -> Result<String> {
         debug!("Getting first image: {}", prompt);
-        let result = self.submit_image(prompt).await?;
+        let result = self.submit_image(prompt).await.map_err(|e| {
+            error!("提交图片失败: {}", e);
+            e
+        })?;
         let id = result.result;
         let start = Instant::now() + Duration::from_secs(60);
         let mut interval = time::interval_at(start, time::Duration::from_secs(60));
@@ -30,6 +33,7 @@ impl Midjourney {
             let jog = match self.get_job(&id).await {
                 std::result::Result::Ok(jog) => jog,
                 Err(err) => {
+                    log::error!("生成图片出错: {}", err);
                     retry_count += 1;
                     if retry_count <= 5 {
                         continue; // 继续循环进行重试

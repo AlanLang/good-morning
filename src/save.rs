@@ -5,10 +5,11 @@ use serde::{Deserialize, Serialize};
 #[serde(rename_all = "camelCase")]
 pub struct SavedResult {
     pub poetry: String,
+    pub author: String,
     pub img_url: String,
 }
 
-pub fn save(poetry: &str, img_url: &str) -> Result<()> {
+pub fn save(poetry: &str, author: &str, img_url: &str) -> Result<()> {
     let saved_file: &str = "./saved.json";
     let mut saved: Vec<SavedResult> = match std::fs::read_to_string(saved_file) {
         Ok(content) => serde_json::from_str(&content).unwrap_or_default(),
@@ -16,6 +17,7 @@ pub fn save(poetry: &str, img_url: &str) -> Result<()> {
     };
     saved.push(SavedResult {
         poetry: poetry.to_string(),
+        author: author.to_string(),
         img_url: img_url.to_string(),
     });
     std::fs::write(saved_file, serde_json::to_string(&saved)?)?;
@@ -26,13 +28,15 @@ pub fn save(poetry: &str, img_url: &str) -> Result<()> {
 fn test_save() -> Result<(), Box<dyn std::error::Error>> {
     let poetry = "Roses are red, violets are blue";
     let img_url = "https://example.com/image.png";
+    let author = "author";
     let expected_saved = vec![SavedResult {
         poetry: poetry.to_string(),
+        author: author.to_string(),
         img_url: img_url.to_string(),
     }];
 
     // Call the save function
-    save(poetry, img_url)?;
+    save(poetry, author, img_url)?;
 
     // Read the saved file and deserialize its contents
     let saved_file = "./saved.json";

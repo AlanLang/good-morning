@@ -153,7 +153,7 @@ async fn run(env: TaskEnv) -> Result<()> {
     );
     let message = MessageInfo::new(title, description, image.clone());
     info!("message is {:?}", message);
-    let _ = save::save(&poetry.content, &image);
+    let _ = save::save(&poetry.content, &poetry.author, &image);
     let _ = send_message(&env.wechat_bot_url, message).await?;
     Ok(())
 }
