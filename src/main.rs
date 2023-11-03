@@ -107,16 +107,19 @@ async fn run(env: TaskEnv) -> Result<()> {
         .await?;
     let prompt = format!("{} {}", prompt, "--ar 1068:455");
     let midjourney = midjourney::Midjourney::new(env.mj_url, env.mj_secret);
+    let default_image = "https://vip2.loli.io/2023/10/21/3KHuaY2ZkiPoeT4.png";
     let mut image = midjourney
         .get_first_image(&prompt)
         .await
         .unwrap_or_else(|e| {
             log::error!("生成图片出错: {}", e);
-            return "https://vip2.loli.io/2023/08/02/FZS59UEMp7BqoTW.webp".to_string();
+            return default_image.to_string();
         });
 
-    if let Some(token) = env.smms_token {
-        image = upload_image(token, image).await?;
+    if image != default_image {
+        if let Some(token) = env.smms_token {
+            image = upload_image(token, image).await?;
+        }
     }
 
     let forecast = &weather.data.forecast[0];
@@ -153,7 +156,9 @@ async fn run(env: TaskEnv) -> Result<()> {
     );
     let message = MessageInfo::new(title, description, image.clone());
     info!("message is {:?}", message);
-    let _ = save::save(&poetry.content, &poetry.author, &image);
+    if image != default_image {
+        let _ = save::save(&poetry.content, &poetry.author, &image);
+    }
     let _ = send_message(&env.wechat_bot_url, message).await?;
     Ok(())
 }
