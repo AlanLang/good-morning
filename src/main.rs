@@ -39,9 +39,7 @@ async fn main() {
             )
         })
         .unwrap();
-    let wechat_bot_url = env::var("WECHAT_BOT_URL")
-        .map_err(|e| format!("无法获取 WECHAT_BOT_URL 环境变量: {}", e.to_string()))
-        .unwrap();
+    let wechat_bot_url = env::var("WECHAT_BOT_URL").unwrap_or(String::new());
     let smms_token = env::var("SMMS_TOKEN").ok();
     let immediately = env::var("IMMEDIATELY").ok();
 
@@ -159,6 +157,10 @@ async fn run(env: TaskEnv) -> Result<()> {
     if image != default_image {
         let _ = save::save(&poetry.content, &poetry.author, &image);
         let _ = save::download_image(&image).await;
+    }
+    // if wechat_bot_url is not empty, send message to wechat
+    if env.wechat_bot_url.is_empty() {
+        return Ok(());
     }
     let _ = send_message(&env.wechat_bot_url, message).await?;
     Ok(())
