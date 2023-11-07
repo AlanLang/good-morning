@@ -24,6 +24,23 @@ pub fn save(poetry: &str, author: &str, img_url: &str) -> Result<()> {
     Ok(())
 }
 
+pub async fn download_image(url: &str) -> Result<()> {
+    let req = reqwest::get(url).await?;
+    let bytes = req.bytes().await?;
+    let image = bytes.to_vec();
+    // get file name from url
+    let file_name = url.split('/').last().unwrap_or("image.png");
+    // 如果没有 images 目录则创建
+    let dir = std::path::Path::new("./images");
+    if !dir.exists() {
+        std::fs::create_dir(dir)?;
+    }
+    // 下载到 images 目录
+    let file_name = format!("./images/{}", file_name);
+    std::fs::write(file_name, image)?;
+    Ok(())
+}
+
 #[test]
 fn test_save() -> Result<(), Box<dyn std::error::Error>> {
     let poetry = "Roses are red, violets are blue";

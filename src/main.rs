@@ -158,6 +158,7 @@ async fn run(env: TaskEnv) -> Result<()> {
     info!("message is {:?}", message);
     if image != default_image {
         let _ = save::save(&poetry.content, &poetry.author, &image);
+        let _ = save::download_image(&image).await;
     }
     let _ = send_message(&env.wechat_bot_url, message).await?;
     Ok(())
