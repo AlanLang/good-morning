@@ -1,28 +1,34 @@
-use anyhow::{Ok, Result};
-use log::debug;
+use rand::prelude::*;
 use serde::{Deserialize, Serialize};
+use std::{fs::File, io::BufReader};
 
-pub async fn get_poetry() -> Result<PoetryResult> {
-    debug!("Getting poetry");
-    let url = format!("https://v1.jinrishici.com/shanshui");
-    let body = reqwest::get(url).await?.json::<PoetryResult>().await?;
-    Ok(body)
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct Poetry {
+    pub poetry: String,
+    pub author: String,
+    pub img_url: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PoetryResult {
-    pub content: String,
-    pub origin: String,
-    pub author: String,
-    pub category: String,
+pub fn get_poetry() -> anyhow::Result<Poetry> {
+    let file = File::open("./poetry.json").expect("cannot open poetry file");
+    let reader = BufReader::new(file);
+    let data: Vec<Poetry> = serde_json::from_reader(reader)?;
+
+    let mut rng = rand::thread_rng();
+    let random_index = rng.gen_range(0..data.len());
+
+    // 获取随机的数组项的引用
+    let random_item_ref = data
+        .get(random_index)
+        .ok_or(anyhow::anyhow!("Index out of range"))?;
+    Ok(random_item_ref.clone()) // 返回项的克隆
 }
 
 #[cfg(test)]
 mod tests {
     #[tokio::test]
     async fn it_works() {
-        let poetry = super::get_poetry().await.unwrap();
-        assert!(poetry.content.len() > 0);
+        let poetry = super::get_poetry().unwrap();
     }
 }
