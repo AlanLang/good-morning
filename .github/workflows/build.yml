@@ -31,3 +31,4 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         source: "target/release/good_morning"
         target: "/opt/app/good-morning/"
+        strip_components: 1
