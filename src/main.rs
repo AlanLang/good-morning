@@ -75,6 +75,7 @@ struct TaskEnv {
 
 async fn run(env: TaskEnv) -> Result<()> {
     let weather = get_weather(&env.city_code).await?;
+    debug!("weather is {:?}", weather);
     let poetry = poetry::get_poetry()?;
     debug!("poetry is {:?}", poetry);
     let gpt = Chat::new(env.gpt_token)?;

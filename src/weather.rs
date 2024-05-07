@@ -25,7 +25,6 @@ pub struct WeatherResult {
 pub struct CityInfo {
     pub city: String,
     pub citykey: String,
-    pub parent: String,
     pub update_time: String,
 }
 
@@ -86,6 +85,5 @@ mod tests {
         // 验证 state = 200
         assert_eq!(weather.status, 200);
         assert_eq!(weather.city_info.city, "无锡市");
-        assert_eq!(weather.city_info.parent, "江苏");
     }
 }
